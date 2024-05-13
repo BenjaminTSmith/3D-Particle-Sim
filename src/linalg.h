@@ -51,13 +51,20 @@ typedef union {
     float mat[16];
 } mat4;
 
+extern const mat4 identityMatrix;
+
 vec2 vec2Add(vec2, vec2);
 vec2 vec2Subtract(vec2, vec2);
+vec3 vec3Add(vec3, vec3);
 vec3 vec3Subtract(vec3, vec3);
+
+vec3 normalizeVec3(vec3);
 
 float vec2Multiply(vec2, vec2);
 float vec3Multiply(vec3, vec3);
 float vec4Multiply(vec4, vec4);
+
+vec3 vec3ScalarMutliply(vec3, float);
 
 vec3 crossVec3(vec3, vec3);
 
@@ -72,5 +79,8 @@ mat4 mat4Multiply(mat4, mat4);
 vec2 rotateVec2(vec2, float theta);
 
 mat4 lookAt(vec3, vec3, vec3);
+
+mat4 ortho(float, float, float, float, float, float);
+mat4 perspective(float, float, float, float);
 
 #endif // !LINALG_H

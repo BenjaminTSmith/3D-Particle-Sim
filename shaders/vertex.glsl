@@ -1,13 +1,15 @@
 #version 330 core
 layout (location = 0) in vec3 pos;
-layout (location = 1) in vec3 iColor;
-layout (location = 2) in vec2 iTexCoord;
+layout (location = 1) in vec2 iTexCoord;
 
 out vec3 color;
 out vec2 texCoord;
 
+uniform mat4 model;
+uniform mat4 view;
+uniform mat4 projection;
+
 void main() {
-    gl_Position = vec4(vec2(pos.x, pos.y), 0, 1);
-    color = iColor;
+    gl_Position = projection * view * model * vec4(pos, 1);
     texCoord = iTexCoord;
 }
