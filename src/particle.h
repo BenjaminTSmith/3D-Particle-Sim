@@ -4,13 +4,13 @@
 #include "linalg.h"
 
 typedef struct {
-    vec2 position;
-    vec2 velocity;
-    vec2 acceleration;
+    vec3 position;
+    vec3 velocity;
+    vec3 acceleration;
     float radius;
 } Particle;
 
 void updateParticle(Particle *);
-void handleCollision(Particle *, Particle *);
+void checkCollision(Particle *, Particle *);
 
 #endif // !PARTICLE_H

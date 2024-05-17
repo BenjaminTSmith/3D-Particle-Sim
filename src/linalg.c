@@ -7,6 +7,10 @@ const mat4 identityMatrix = {{
     0, 0, 0, 1
 }};
 
+float degToRadians(float degrees) {
+    return degrees * (PI / 180);
+}
+
 vec2 vec2Add(vec2 lhs, vec2 rhs) {
     vec2 result;
     result.x = lhs.x + rhs.x;
@@ -38,13 +42,20 @@ float vec3Multiply(vec3 lhs, vec3 rhs) {
     return lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z;
 }
 
-vec3 vec3ScalarMutliply(vec3 lhs, float scalar) {
+vec3 vec3ScalarMultiply(vec3 lhs, float scalar) {
     vec3 result = {{
         lhs.x * scalar,
         lhs.y * scalar,
         lhs.z * scalar,
     }};
     return result;
+}
+
+float vec3Distance(vec3 a, vec3 b) {
+    float xSquared = (a.x - b.x) * (a.x - b.x);
+    float ySquared = (a.y - b.y) * (a.y - b.y);
+    float zSquared = (a.z - b.z) * (a.z - b.z);
+    return sqrt(xSquared + ySquared + zSquared);
 }
 
 vec3 vec3Subtract(vec3 lhs, vec3 rhs) {
@@ -125,6 +136,26 @@ vec2 rotateVec2(vec2 vec, float theta) {
         sin(theta), cos(theta)
     }};   
     return mat2Vec2Multiply(transform, vec);
+}
+
+mat4 scale(mat4 matrix, vec3 scale) {
+    mat4 scaleMat = {{
+        scale.x, 0,       0,       0,
+        0,       scale.y, 0,       0,
+        0,       0,       scale.z, 0,
+        0,       0,       0,       1
+    }};
+    return mat4Multiply(scaleMat, matrix);
+}
+
+mat4 translate(mat4 matrix, vec3 translation) {
+    mat4 translateMat = {{
+        1, 0, 0, translation.x,
+        0, 1, 0, translation.y,
+        0, 0, 1, translation.z,
+        0, 0, 0, 1
+    }};
+    return mat4Multiply(translateMat, matrix);
 }
 
 mat4 lookAt(vec3 position, vec3 target, vec3 up) {

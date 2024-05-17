@@ -1,5 +1,19 @@
 #include "shader.h"
 
+void setMat4Uniform(ShaderID shader, const char *uniform, float *matrix) {
+    int uniformLocation = glGetUniformLocation(shader, uniform);
+    if (uniformLocation == -1)
+        printf("Couldn't find uniform: %s\n", uniform);
+    glUniformMatrix4fv(uniformLocation, 1, GL_TRUE, matrix);
+}
+
+void setVec3Uniform(ShaderID shader, const char *uniform, float *vector) {
+    int uniformLocation = glGetUniformLocation(shader, uniform);
+    if (uniformLocation == -1)
+        printf("Couldn't find uniform: %s\n", uniform);
+    glUniform3fv(uniformLocation, 1, vector);
+}
+
 const char* readFile(const char *filepath) {
     char *shader;
 

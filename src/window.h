@@ -6,6 +6,6 @@
 #include "camera.h"
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
-void processInput(GLFWwindow *window, Camera *camera);
+void processInput(GLFWwindow *window);
 
 #endif // !WINDOW_H

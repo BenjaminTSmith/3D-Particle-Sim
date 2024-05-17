@@ -4,14 +4,13 @@
 #include <stdlib.h>
 
 #include "window.h"
-#include "shader.h"
 #include "linalg.h"
 #include "camera.h"
+#include "shader.h"
+#include "model.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
-
-#define PI 3.1415926535897932384626433832795
 
 int main() {
     glfwInit();
@@ -22,7 +21,7 @@ int main() {
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 
-    GLFWwindow* window = glfwCreateWindow(1080, 720, "Particle Sim", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(1600, 900, "Particle Sim", NULL, NULL);
     glfwMakeContextCurrent(window);
     GLenum err = glewInit();
     glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
@@ -30,74 +29,53 @@ int main() {
         fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
     }
 
-    glViewport(0, 0, 1020, 720);
+    glViewport(0, 0, 1600, 900);
 
     ShaderID shaderProgram = createShader("shaders/vertex.glsl", "shaders/fragment.glsl");
-    glUseProgram(shaderProgram);
-
-    unsigned int texture;
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    int width, height, numberOfChannels;
-    stbi_set_flip_vertically_on_load(1);
-    unsigned char *container = stbi_load("container.jpg", &width, &height, &numberOfChannels, 0);
-
-    if (container) {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, container);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    } else {
-        printf("container.jpg failed to load.\n");
-    }
-    stbi_image_free(container);
+    ShaderID lightingShader = createShader("shaders/vertex.glsl", "shaders/lighting.glsl");
 
     float vertices[] = {
-        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-        0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-        0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+        0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
+        0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
+        0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
+        -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
+        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
 
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-        0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-        0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+        0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+        0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+        0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
 
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+        -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+        -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+        -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+        -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+        -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
 
-        0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+        0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+        0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+        0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+        0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+        0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
 
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-        0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-        0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+        0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+        0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+        0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
 
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-        0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+        -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+        0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+        0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+        0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
     };
 
     unsigned int VAO, VBO;
@@ -108,27 +86,21 @@ int main() {
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-    // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)0);
     glEnableVertexAttribArray(0);
-    // tex coord attribute
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)(3 * sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
+    unsigned int lightVAO;
+    glGenVertexArrays(1, &lightVAO);
+    glBindVertexArray(lightVAO);
 
-    glClearColor(0.1, 0.1, 0.1, 1.0);
-
-    mat4 model = identityMatrix;
-    int modelUniform = glGetUniformLocation(shaderProgram, "model");
-    glUniformMatrix4fv(modelUniform, 1, GL_TRUE, model.mat);
-
-    mat4 projection = perspective(PI / 4, 800. / 600., 0.1, 100);
-    int projectionUniform = glGetUniformLocation(shaderProgram, "projection");
-    glUniformMatrix4fv(projectionUniform, 1, GL_TRUE, projection.mat);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)0);
+    glEnableVertexAttribArray(0);
 
     glEnable(GL_DEPTH_TEST);
+    glClearColor(0.12, 0.1, 0.11, 1.0);
 
     Camera camera;
     vec3 position = {{ 0, 0, 3 }};
@@ -139,29 +111,62 @@ int main() {
     camera.up = up;
     camera.speed = 0.05;
 
+    float delta = 0;
+    float lastFrame = 0;
+
+    vec3 origin = {{ 0, 0, 0 }};
+
     while (!glfwWindowShouldClose(window)) {
-        processInput(window, &camera);
+        processInput(window);
+
+        float frame = glfwGetTime();
+        delta = frame - lastFrame;
+        lastFrame = frame;
+        (void)delta;
+
+        camera.position.x = sin(glfwGetTime() / 2) * 5;
+        camera.position.z = cos(glfwGetTime() / 2) * 5;
+        camera.front = normalizeVec3(vec3Subtract(origin, camera.position));
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glUseProgram(shaderProgram);
+        glUseProgram(lightingShader);
 
-        mat4 view = lookAt(camera.position, vec3Add(camera.front, camera.position), camera.up);
-        int viewUniform = glGetUniformLocation(shaderProgram, "view");
-        glUniformMatrix4fv(viewUniform, 1, GL_TRUE, view.mat);
-
-        glBindTexture(GL_TEXTURE_2D, texture);
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        mat4 view = lookAt(camera.position, vec3Add(camera.front, camera.position), camera.up);
+        mat4 projection = perspective(PI / 4, 800. / 600., 0.1, 100);
+
+        glUseProgram(shaderProgram);
+        vec3 lightPos = {{ sin(glfwGetTime()) * 2, 1, cos(glfwGetTime()) * 2 }};
+        vec3 lightScale = {{ 0.1, 0.1, 0.1 }};
+        mat4 lightModel = scale(identityMatrix, lightScale);
+        lightModel = translate(lightModel, lightPos);
+        setMat4Uniform(shaderProgram, "model", lightModel.mat);
+        setMat4Uniform(shaderProgram, "view", view.mat);
+        setMat4Uniform(shaderProgram, "projection", projection.mat);
+        glBindVertexArray(lightVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        glUseProgram(lightingShader);
+        mat4 model = identityMatrix;
+        setMat4Uniform(lightingShader, "model", model.mat);
+        setMat4Uniform(lightingShader, "view", view.mat);
+        setMat4Uniform(lightingShader, "projection", projection.mat);
+        setVec3Uniform(lightingShader, "lightPos", lightPos.vec);
+        vec3 lightColor = {{ 1, 1, 1 }};
+        setVec3Uniform(lightingShader, "lightColor", lightColor.vec);
+        vec3 objectColor = {{ 1.0, 0.5, 0.31 }};
+        setVec3Uniform(lightingShader, "objectColor", objectColor.vec);
 
         glfwSwapBuffers(window);
         glfwPollEvents();    
     }
 
-    glUseProgram(0);
     glDeleteProgram(shaderProgram);
+    glDeleteProgram(lightingShader);
     glfwTerminate();
 
     return 0;
 } 
-

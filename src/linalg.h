@@ -3,6 +3,8 @@
 
 #include <math.h>
 
+#define PI 3.1415926535897932384626433832795
+
 typedef union {
     struct {
         float x, y;
@@ -53,6 +55,8 @@ typedef union {
 
 extern const mat4 identityMatrix;
 
+float degToRadians(float);
+
 vec2 vec2Add(vec2, vec2);
 vec2 vec2Subtract(vec2, vec2);
 vec3 vec3Add(vec3, vec3);
@@ -64,7 +68,9 @@ float vec2Multiply(vec2, vec2);
 float vec3Multiply(vec3, vec3);
 float vec4Multiply(vec4, vec4);
 
-vec3 vec3ScalarMutliply(vec3, float);
+vec3 vec3ScalarMultiply(vec3, float);
+
+float vec3Distance(vec3, vec3);
 
 vec3 crossVec3(vec3, vec3);
 
@@ -77,6 +83,9 @@ mat3 mat3Multiply(mat3, mat3);
 mat4 mat4Multiply(mat4, mat4);
 
 vec2 rotateVec2(vec2, float theta);
+
+mat4 scale(mat4, vec3);
+mat4 translate(mat4, vec3);
 
 mat4 lookAt(vec3, vec3, vec3);
 
