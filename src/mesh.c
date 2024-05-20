@@ -1,5 +1,4 @@
-#include "model.h"
-#include <stdio.h>
+#include "mesh.h"
 
 Array instantiateArray(size_t capacity) {
     Array array;
@@ -99,11 +98,4 @@ Mesh createMesh(const char *filename) {
 
     clean(&vertices);
     return mesh;
-}
-
-Model createModel(Mesh mesh, mat4 modelMatrix) {
-    Model model;
-    model.mesh = mesh;
-    model.model = modelMatrix;
-    return model;
 }

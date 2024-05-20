@@ -20,17 +20,11 @@ typedef struct {
     unsigned int VAO, VBO, vertexCount;
 } Mesh;
 
-typedef struct {
-    Mesh mesh;
-    mat4 model;
-} Model;
-
 Array instantiateArray(size_t capacity);
 void push(Array *, float);
 void clean(Array *);
 
 Array readOBJ(const char *);
 Mesh createMesh(const char *);
-Model createModel(Mesh, mat4);
 
 #endif // !MODEL_H
