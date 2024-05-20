@@ -32,71 +32,17 @@ int main() {
     glViewport(0, 0, 1600, 900);
 
     ShaderID shaderProgram = createShader("shaders/vertex.glsl", "shaders/fragment.glsl");
-    ShaderID lightingShader = createShader("shaders/vertex.glsl", "shaders/lighting.glsl");
+    ShaderID sphereProgram = createShader("shaders/sphere_vertex.glsl", "shaders/lighting.glsl");
 
-    float vertices[] = {
-        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-        0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
-        0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
-        0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
-        -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
-        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
-
-        -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-        0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-        0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-        0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-
-        -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-        -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-        -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-        -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-        -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-        -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-
-        0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-        0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-        0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-        0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-        0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-        0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-
-        -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-        0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-        0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-        0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-
-        -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-        0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-        0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-        0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
-    };
-
-    unsigned int VAO, VBO;
-    glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);
-
-    glGenBuffers(1, &VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)0);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
+    Mesh sphereMesh = createMesh("models/sphere.obj");
+    Model sphere = createModel(sphereMesh, identityMatrix);
 
     unsigned int lightVAO;
     glGenVertexArrays(1, &lightVAO);
     glBindVertexArray(lightVAO);
 
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)0);
+    glBindBuffer(GL_ARRAY_BUFFER, sphereMesh.VBO);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)0);
     glEnableVertexAttribArray(0);
 
     glEnable(GL_DEPTH_TEST);
@@ -117,6 +63,8 @@ int main() {
     vec3 origin = {{ 0, 0, 0 }};
 
     while (!glfwWindowShouldClose(window)) {
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
         processInput(window);
 
         float frame = glfwGetTime();
@@ -128,44 +76,42 @@ int main() {
         camera.position.z = cos(glfwGetTime() / 2) * 5;
         camera.front = normalizeVec3(vec3Subtract(origin, camera.position));
 
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        glUseProgram(lightingShader);
-
-        glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
 
         mat4 view = lookAt(camera.position, vec3Add(camera.front, camera.position), camera.up);
-        mat4 projection = perspective(PI / 4, 800. / 600., 0.1, 100);
-
-        glUseProgram(shaderProgram);
+        mat4 projection = perspective(PI / 4, 16. / 9., 0.1, 100);
         vec3 lightPos = {{ sin(glfwGetTime()) * 2, 1, cos(glfwGetTime()) * 2 }};
         vec3 lightScale = {{ 0.1, 0.1, 0.1 }};
         mat4 lightModel = scale(identityMatrix, lightScale);
         lightModel = translate(lightModel, lightPos);
+        vec3 lightColor = {{ 1, 1, 1 }};
+        vec3 objectColor = {{ 1, 0, 0 }};
+
+        glUseProgram(sphereProgram);
+        mat4 model = identityMatrix;
+        setMat4Uniform(sphereProgram, "model", model.mat);
+        setMat4Uniform(sphereProgram, "view", view.mat);
+        setMat4Uniform(sphereProgram, "projection", projection.mat);
+        setVec3Uniform(sphereProgram, "lightPos", lightPos.vec);
+        setVec3Uniform(sphereProgram, "lightColor", lightColor.vec);
+        setVec3Uniform(sphereProgram, "objectColor", objectColor.vec);
+
+        glBindVertexArray(sphere.mesh.VAO);
+        glDrawArrays(GL_TRIANGLES, 0, sphere.mesh.vertexCount);
+
+        glUseProgram(shaderProgram);
         setMat4Uniform(shaderProgram, "model", lightModel.mat);
         setMat4Uniform(shaderProgram, "view", view.mat);
         setMat4Uniform(shaderProgram, "projection", projection.mat);
         glBindVertexArray(lightVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        glDrawArrays(GL_TRIANGLES, 0, sphere.mesh.vertexCount);
 
-        glUseProgram(lightingShader);
-        mat4 model = identityMatrix;
-        setMat4Uniform(lightingShader, "model", model.mat);
-        setMat4Uniform(lightingShader, "view", view.mat);
-        setMat4Uniform(lightingShader, "projection", projection.mat);
-        setVec3Uniform(lightingShader, "lightPos", lightPos.vec);
-        vec3 lightColor = {{ 1, 1, 1 }};
-        setVec3Uniform(lightingShader, "lightColor", lightColor.vec);
-        vec3 objectColor = {{ 1.0, 0.5, 0.31 }};
-        setVec3Uniform(lightingShader, "objectColor", objectColor.vec);
 
         glfwSwapBuffers(window);
         glfwPollEvents();    
     }
 
     glDeleteProgram(shaderProgram);
-    glDeleteProgram(lightingShader);
+    glDeleteProgram(sphereProgram);
     glfwTerminate();
 
     return 0;
