@@ -63,6 +63,7 @@ vec3 vec3Add(vec3, vec3);
 vec3 vec3Subtract(vec3, vec3);
 
 vec3 normalizeVec3(vec3);
+float vec3Magnitude(vec3);
 
 float vec2Multiply(vec2, vec2);
 float vec3Multiply(vec3, vec3);

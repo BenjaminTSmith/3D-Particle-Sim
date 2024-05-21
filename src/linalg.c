@@ -76,6 +76,10 @@ vec3 normalizeVec3(vec3 vec) {
     return result;
 }
 
+float vec3Magnitude(vec3 vec) {
+    return sqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
+}
+
 float vec4Multiply(vec4 lhs, vec4 rhs) {
     return lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z + lhs.w * rhs.w;
 }

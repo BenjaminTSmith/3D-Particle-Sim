@@ -1,8 +1,6 @@
 #ifndef PARTICLE_H
 #define PARTICLE_H
 
-#define DAMPING_CONSTANT 0.5
-
 #include "linalg.h"
 
 typedef struct {
