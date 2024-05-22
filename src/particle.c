@@ -1,6 +1,6 @@
 #include "particle.h"
 
-#define DAMPING_CONSTANT 0.9
+#define DAMPING_CONSTANT 0.7
 
 void updateParticle(Particle *particle, float dt) {
     particle->velocity = vec3Add(particle->velocity, vec3ScalarMultiply(particle->acceleration, dt));

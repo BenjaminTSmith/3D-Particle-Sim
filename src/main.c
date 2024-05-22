@@ -13,7 +13,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
-#define PARTICLE_COUNT 500
+#define PARTICLE_COUNT 200
 
 int main() {
     glfwInit();
@@ -61,13 +61,16 @@ int main() {
     Particle particles[PARTICLE_COUNT];
     vec3 gravity = {{ 0, -200, 0 }};
     for (int i = 0; i < PARTICLE_COUNT; i++) {
-        particles[i].radius = 3;
+        particles[i].radius = 5;
         vec3 position = {{ i / 2., i / 3., i / 4. }};
         particles[i].position = position;
         vec3 velocity = {{ sin(i) * 100, sin(rand() % 2) * 100, cos(rand() % 2) * 100 }};
         particles[i].velocity = velocity;
         particles[i].acceleration = gravity;
     }
+
+    // glEnable(GL_BLEND);
+    // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     while (!glfwWindowShouldClose(window)) {
         float frame = glfwGetTime();
@@ -83,9 +86,15 @@ int main() {
                 attraction = normalizeVec3(attraction);
                 particles[i].acceleration = vec3ScalarMultiply(attraction, 500);
             }
-        } else {
+        } 
+        if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS) {
             for (int i = 0; i < PARTICLE_COUNT; i++) {
                 particles[i].acceleration = gravity;
+            }
+        } 
+        if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS) {
+            for (int i = 0; i < PARTICLE_COUNT; i++) {
+                particles[i].acceleration = origin;
             }
         }
 
