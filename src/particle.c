@@ -1,6 +1,6 @@
 #include "particle.h"
 
-#define DAMPING_CONSTANT 0.7
+#define DAMPING_CONSTANT 0.8
 
 void updateParticle(Particle *particle, float dt) {
     particle->velocity = vec3Add(particle->velocity, vec3ScalarMultiply(particle->acceleration, dt));
@@ -9,8 +9,6 @@ void updateParticle(Particle *particle, float dt) {
 
 void checkContainerCollision(Particle *particle) {
     // SPHERE
-    // TODO: If DAMPING_CONSTANT is too low, particles get stuck
-    // and if too high they start tweaking
     vec3 origin = {{ 0, 0, 0 }};
     float dist = vec3Distance(particle->position, origin) + particle->radius;
     if (dist >= 120) {
@@ -23,6 +21,7 @@ void checkContainerCollision(Particle *particle) {
         particle->velocity = direction;
     }
     // TODO: CUBE
+
 }
 
 void checkCollision(Particle *a, Particle *b) {

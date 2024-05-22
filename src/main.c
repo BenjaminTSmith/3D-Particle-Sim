@@ -13,7 +13,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
-#define PARTICLE_COUNT 200
+#define PARTICLE_COUNT 800
 
 int main() {
     glfwInit();
@@ -59,7 +59,7 @@ int main() {
     mat4 projection = perspective(PI / 4, 16. / 9., 0.1, 1000);
 
     Particle particles[PARTICLE_COUNT];
-    vec3 gravity = {{ 0, -200, 0 }};
+    vec3 gravity = {{ 0, -300, 0 }};
     for (int i = 0; i < PARTICLE_COUNT; i++) {
         particles[i].radius = 5;
         vec3 position = {{ i / 2., i / 3., i / 4. }};
@@ -76,6 +76,7 @@ int main() {
         float frame = glfwGetTime();
         dt = frame - lastFrame;
         lastFrame = frame;
+        printf("%f FPS\n", 1 / dt);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -84,7 +85,7 @@ int main() {
             for (int i = 0; i < PARTICLE_COUNT; i++) {
                 vec3 attraction = vec3Subtract(origin, particles[i].position);
                 attraction = normalizeVec3(attraction);
-                particles[i].acceleration = vec3ScalarMultiply(attraction, 500);
+                particles[i].acceleration = vec3ScalarMultiply(attraction, 100);
             }
         } 
         if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS) {
