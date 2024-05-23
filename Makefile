@@ -17,7 +17,7 @@ GREEN = \033[0;32m
 
 $(OUT) : $(OBJ)
 	echo "[${RED}0%${NC}] Linking Object Files."
-	$(CC) $(CFLAGS) -o $@ $(SRC_DIR)/*.c $(LD_FLAGS)
+	$(CC) $(CFLAGS) -o $@ $(OBJ) $(LD_FLAGS)
 	echo "[${GREEN}100%${NC}] Finished Linking."
 
 %.o : %.c
