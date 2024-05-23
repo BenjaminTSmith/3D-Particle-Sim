@@ -13,7 +13,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
-#define PARTICLE_COUNT 100
+#define PARTICLE_COUNT 1000
 
 int main() {
     glfwInit();
@@ -144,8 +144,8 @@ int main() {
             for (int j = i + 1; j < PARTICLE_COUNT; j++) {
                 checkCollision(&particles[i], &particles[j]);
             }
-            checkContainerCollision(&particles[i]);
             updateParticle(&particles[i], dt);
+            checkContainerCollision(&particles[i]);
         }
 
         glfwSwapBuffers(window);
