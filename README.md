@@ -6,7 +6,8 @@ https://www.youtube.com/watch?v=NorXFOobehY&t=228s
 
 The particles are updated using the implicit Euler method, which means that
 the position vector is updated with the next frames velocity vector rather than
-the current frames. This tends to lead to more stable results:
+the current frames. This tends to lead to more stable results than the explicit
+Euler method:
 ```
 v(t + dt) = v(t) + a(t) * dt
 x(t + dt) = x(t) + v(t + dt) * dt
