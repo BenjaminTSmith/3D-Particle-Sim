@@ -1,6 +1,6 @@
 #include "particle.h"
 
-#define DAMPING_CONSTANT 0.8
+#define DAMPING_CONSTANT 0.7
 
 void updateParticle(Particle *particle, float dt) {
     particle->velocity = vec3Add(particle->velocity, vec3ScalarMultiply(particle->acceleration, dt));
@@ -9,7 +9,7 @@ void updateParticle(Particle *particle, float dt) {
 
 void checkContainerCollision(Particle *particle) {
     // SPHERE
-    vec3 origin = {{ 0, 0, 0 }};
+    /*vec3 origin = {{ 0, 0, 0 }};
     float dist = vec3Distance(particle->position, origin) + particle->radius;
     if (dist >= 120) {
         vec3 direction = vec3Subtract(origin, particle->position);
@@ -19,9 +19,27 @@ void checkContainerCollision(Particle *particle) {
         direction = normalizeVec3(direction);
         direction = vec3ScalarMultiply(direction, vec3Magnitude(particle->velocity) * DAMPING_CONSTANT);
         particle->velocity = direction;
+    }*/
+    // CUBE
+    if (particle->position.x + particle->radius > 90) {
+        particle->velocity.x = -particle->velocity.x * DAMPING_CONSTANT;
+        particle->position.x = 90 - particle->radius;
+    } if (particle->position.x - particle->radius < -90) {
+        particle->velocity.x = -particle->velocity.x * DAMPING_CONSTANT;
+        particle->position.x = -90 + particle->radius;
+    } if (particle->position.z + particle->radius > 90) {
+        particle->velocity.z = -particle->velocity.z * DAMPING_CONSTANT;
+        particle->position.z = 90 - particle->radius;
+    } if (particle->position.z - particle->radius < -90) {
+        particle->velocity.z = -particle->velocity.z * DAMPING_CONSTANT;
+        particle->position.z = -90 + particle->radius;
+    } if (particle->position.y + particle->radius > 90) {
+        particle->velocity.y = -particle->velocity.y * DAMPING_CONSTANT;
+        particle->position.y = 90 - particle->radius;
+    } if (particle->position.y - particle->radius < -90) {
+        particle->velocity.y = -particle->velocity.y * DAMPING_CONSTANT;
+        particle->position.y = -90 + particle->radius;
     }
-    // TODO: CUBE
-
 }
 
 void checkCollision(Particle *a, Particle *b) {

@@ -13,7 +13,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
-#define PARTICLE_COUNT 800
+#define PARTICLE_COUNT 100
 
 int main() {
     glfwInit();
@@ -69,14 +69,17 @@ int main() {
         particles[i].acceleration = gravity;
     }
 
-    // glEnable(GL_BLEND);
-    // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_FRONT);
 
     while (!glfwWindowShouldClose(window)) {
         float frame = glfwGetTime();
         dt = frame - lastFrame;
         lastFrame = frame;
-        printf("%f FPS\n", 1 / dt);
+        printf("\r\b\b\b%f FPS", 1 / dt);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -85,7 +88,7 @@ int main() {
             for (int i = 0; i < PARTICLE_COUNT; i++) {
                 vec3 attraction = vec3Subtract(origin, particles[i].position);
                 attraction = normalizeVec3(attraction);
-                particles[i].acceleration = vec3ScalarMultiply(attraction, 100);
+                particles[i].acceleration = vec3ScalarMultiply(attraction, 200);
             }
         } 
         if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS) {
@@ -104,16 +107,7 @@ int main() {
         camera.front = normalizeVec3(vec3Subtract(origin, camera.position));
         mat4 view = lookAt(camera.position, vec3Add(camera.front, camera.position), camera.up);
 
-        glUseProgram(containerProgram);
-        vec3 sphereScale = {{ 120, 120, 120 }};
-        mat4 model = scale(identityMatrix, sphereScale);
-        setMat4Uniform(containerProgram, "model", model.mat);
-        setMat4Uniform(containerProgram, "view", view.mat);
-        setMat4Uniform(containerProgram, "projection", projection.mat);
-
-        glBindVertexArray(sphereMesh.VAO);
-        glDrawArrays(GL_POINTS, 0, sphereMesh.vertexCount);
-
+        glDisable(GL_CULL_FACE);
         glUseProgram(particleProgram);
         vec3 lightPos = {{ 100, 200, 0 }};
         vec3 lightColor = {{ 1, 1, 1 }};
@@ -123,6 +117,7 @@ int main() {
         setVec3Uniform(particleProgram, "objectColor", objectColor.vec);
         setMat4Uniform(particleProgram, "view", view.mat);
         setMat4Uniform(particleProgram, "projection", projection.mat);
+        glBindVertexArray(sphereMesh.VAO);
         for (int i= 0; i < PARTICLE_COUNT; i++) {
             vec3 particleScale = {{ 
                 particles[i].radius,
@@ -134,6 +129,16 @@ int main() {
             setMat4Uniform(particleProgram, "model", model.mat);
             glDrawArrays(GL_TRIANGLES, 0, sphereMesh.vertexCount);
         }
+        glEnable(GL_CULL_FACE);
+        glUseProgram(containerProgram);
+        // vec3 sphereScale = {{ 120, 120, 120 }};
+        vec3 cubeScale = {{ 180, 180, 180 }};
+        mat4 model = scale(identityMatrix, cubeScale);
+        setMat4Uniform(containerProgram, "model", model.mat);
+        setMat4Uniform(containerProgram, "view", view.mat);
+        setMat4Uniform(containerProgram, "projection", projection.mat);
+        glBindVertexArray(cubeMesh.VAO);
+        glDrawArrays(GL_TRIANGLES, 0, cubeMesh.vertexCount);
 
         for (int i = 0; i < PARTICLE_COUNT; i++) {
             for (int j = i + 1; j < PARTICLE_COUNT; j++) {
@@ -146,6 +151,7 @@ int main() {
         glfwSwapBuffers(window);
         glfwPollEvents();    
     }
+    printf("\n");
 
     glDeleteProgram(containerProgram);
     glfwTerminate();
